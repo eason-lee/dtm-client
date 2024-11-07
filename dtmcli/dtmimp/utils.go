@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/dtm-labs/logger"
+	"github.com/go-pg/pg"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -219,6 +220,23 @@ func DBExec(dbType string, db DB, sql string, values ...interface{}) (affected i
 	return
 }
 
+func DBExecForGoPg(dbType string, db *pg.Tx, sql string, values ...interface{}) (affected int64, rerr error) {
+	if sql == "" {
+		return 0, nil
+	}
+	began := time.Now()
+	sql = GetDBSpecial(dbType).GetPlaceHoldSQL(sql)
+	r, rerr := db.Exec(sql, values...)
+	used := time.Since(began) / time.Millisecond
+	if rerr == nil {
+		affected = int64(r.RowsAffected())
+		logger.Debugf("used: %d ms affected: %d for %s %v", used, affected, sql, values)
+	} else {
+		logger.Errorf("used: %d ms exec error: %v for %s %v", used, rerr, sql, values)
+	}
+	return
+}
+
 // GetDsn get dsn from map config
 func GetDsn(conf DBConf) string {
 	host := MayReplaceLocalhost(conf.Host)
@@ -290,4 +308,18 @@ func InsertBarrier(tx DB, transType string, gid string, branchID string, op stri
 	}
 	sql := GetDBSpecial(dbType).GetInsertIgnoreTemplate(barrierTableName+"(trans_type, gid, branch_id, op, barrier_id, reason) values(?,?,?,?,?,?)", "uniq_barrier")
 	return DBExec(dbType, tx, sql, transType, gid, branchID, op, barrierID, reason)
+}
+
+func InsertBarrierForGoPg(tx *pg.Tx, transType string, gid string, branchID string, op string, barrierID string, reason string, dbType string, barrierTableName string) (int64, error) {
+	if op == "" {
+		return 0, nil
+	}
+	if dbType == "" {
+		dbType = currentDBType
+	}
+	if barrierTableName == "" {
+		barrierTableName = BarrierTableName
+	}
+	sql := GetDBSpecial(dbType).GetInsertIgnoreTemplate(barrierTableName+"(trans_type, gid, branch_id, op, barrier_id, reason) values(?,?,?,?,?,?)", "uniq_barrier")
+	return DBExecForGoPg(dbType, tx, sql, transType, gid, branchID, op, barrierID, reason)
 }

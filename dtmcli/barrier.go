@@ -12,12 +12,15 @@ import (
 	"net/url"
 
 	"github.com/dtm-labs/logger"
-
 	"github.com/eason-lee/dtm-client/dtmcli/dtmimp"
+	"github.com/go-pg/pg"
 )
 
 // BarrierBusiFunc type for busi func
 type BarrierBusiFunc func(tx *sql.Tx) error
+
+// BarrierBusiFunc type for busi func
+type BarrierBusiForGoPgFunc func(tx *pg.Tx) error
 
 // BranchBarrier every branch info
 type BranchBarrier struct {
@@ -117,6 +120,51 @@ func (bb *BranchBarrier) QueryPrepared(db *sql.DB) error {
 	}
 	if reason == dtmimp.OpRollback {
 		return ErrFailure
+	}
+	return err
+}
+
+// CallForGoPg
+func (bb *BranchBarrier) CallForGoPg(tx *pg.Tx, busiCall BarrierBusiForGoPgFunc) (rerr error) {
+	bid := bb.newBarrierID()
+	defer dtmimp.DeferDo(&rerr, func() error {
+		return tx.Commit()
+	}, func() error {
+		return tx.Rollback()
+	})
+	originOp := map[string]string{
+		dtmimp.OpCancel:     dtmimp.OpTry,    // tcc
+		dtmimp.OpCompensate: dtmimp.OpAction, // saga
+		dtmimp.OpRollback:   dtmimp.OpAction, // workflow
+	}[bb.Op]
+
+	originAffected, oerr := dtmimp.InsertBarrierForGoPg(tx, bb.TransType, bb.Gid, bb.BranchID, originOp, bid, bb.Op, bb.DBType, bb.BarrierTableName)
+	currentAffected, rerr := dtmimp.InsertBarrierForGoPg(tx, bb.TransType, bb.Gid, bb.BranchID, bb.Op, bid, bb.Op, bb.DBType, bb.BarrierTableName)
+	logger.Debugf("originAffected: %d currentAffected: %d", originAffected, currentAffected)
+
+	if rerr == nil && bb.Op == dtmimp.MsgDoOp && currentAffected == 0 { // for msg's DoAndSubmit, repeated insert should be rejected.
+		return ErrDuplicated
+	}
+
+	if rerr == nil {
+		rerr = oerr
+	}
+
+	if (bb.Op == dtmimp.OpCancel || bb.Op == dtmimp.OpCompensate || bb.Op == dtmimp.OpRollback) && originAffected > 0 || // null compensate
+		currentAffected == 0 { // repeated request or dangled request
+		return
+	}
+	if rerr == nil {
+		rerr = busiCall(tx)
+	}
+	return
+}
+
+// CallWithDB the same as Call, but with *sql.DB
+func (bb *BranchBarrier) CallWithDBForGoPg(db *pg.DB, busiCall BarrierBusiForGoPgFunc) error {
+	tx, err := db.Begin()
+	if err == nil {
+		err = bb.CallForGoPg(tx, busiCall)
 	}
 	return err
 }
