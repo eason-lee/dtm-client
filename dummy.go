@@ -1,7 +1,7 @@
 package client_test
 
 import (
-	_ "github.com/dtm-labs/client/dtmcli"
-	_ "github.com/dtm-labs/client/dtmgrpc"
-	_ "github.com/dtm-labs/client/workflow"
+	_ "github.com/eason-lee/dtm-client/dtmcli"
+	_ "github.com/eason-lee/dtm-client/dtmgrpc"
+	_ "github.com/eason-lee/dtm-client/workflow"
 )

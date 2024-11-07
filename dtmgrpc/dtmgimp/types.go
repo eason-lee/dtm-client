@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dtm-labs/client/dtmcli/dtmimp"
 	"github.com/dtm-labs/dtmdriver"
 	"github.com/dtm-labs/logger"
 	"google.golang.org/grpc"
@@ -19,6 +18,8 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
+
+	"github.com/eason-lee/dtm-client/dtmcli/dtmimp"
 )
 
 // GrpcServerLog middleware to print server-side grpc log

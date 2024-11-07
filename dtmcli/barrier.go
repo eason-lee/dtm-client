@@ -13,7 +13,7 @@ import (
 
 	"github.com/dtm-labs/logger"
 
-	"github.com/dtm-labs/client/dtmcli/dtmimp"
+	"github.com/eason-lee/dtm-client/dtmcli/dtmimp"
 )
 
 // BarrierBusiFunc type for busi func

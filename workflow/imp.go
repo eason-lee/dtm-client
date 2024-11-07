@@ -6,21 +6,22 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/dtm-labs/client/dtmcli"
-	"github.com/dtm-labs/client/dtmcli/dtmimp"
-	"github.com/dtm-labs/client/dtmgrpc/dtmgpb"
 	"github.com/dtm-labs/logger"
 	"github.com/go-resty/resty/v2"
+
+	"github.com/eason-lee/dtm-client/dtmcli"
+	"github.com/eason-lee/dtm-client/dtmcli/dtmimp"
+	"github.com/eason-lee/dtm-client/dtmgrpc/dtmgpb"
 )
 
 type workflowImp struct {
-	restyClient          *resty.Client //nolint
+	restyClient          *resty.Client // nolint
 	idGen                dtmimp.BranchIDGen
-	currentBranch        string                 //nolint
-	currentActionAdded   bool                   //nolint
-	currentCommitAdded   bool                   //nolint
-	currentRollbackAdded bool                   //nolint
-	progresses           map[string]*stepResult //nolint
+	currentBranch        string                 // nolint
+	currentActionAdded   bool                   // nolint
+	currentCommitAdded   bool                   // nolint
+	currentRollbackAdded bool                   // nolint
+	progresses           map[string]*stepResult // nolint
 	currentOp            string
 	succeededOps         []workflowPhase2Item
 	failedOps            []workflowPhase2Item

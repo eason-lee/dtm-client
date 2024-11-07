@@ -7,9 +7,10 @@
 package dtmgrpc
 
 import (
-	"github.com/dtm-labs/client/dtmcli"
-	"github.com/dtm-labs/client/dtmgrpc/dtmgimp"
 	"google.golang.org/protobuf/proto"
+
+	"github.com/eason-lee/dtm-client/dtmcli"
+	"github.com/eason-lee/dtm-client/dtmgrpc/dtmgimp"
 )
 
 // SagaGrpc struct of saga

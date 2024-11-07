@@ -10,11 +10,12 @@ import (
 	context "context"
 	"fmt"
 
-	"github.com/dtm-labs/client/dtmcli/dtmimp"
-	"github.com/dtm-labs/client/dtmgrpc/dtmgimp"
-	"github.com/dtm-labs/client/dtmgrpc/dtmgpb"
 	grpc "google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
+
+	"github.com/eason-lee/dtm-client/dtmcli/dtmimp"
+	"github.com/eason-lee/dtm-client/dtmgrpc/dtmgimp"
+	"github.com/eason-lee/dtm-client/dtmgrpc/dtmgpb"
 )
 
 // TccGrpc struct of tcc

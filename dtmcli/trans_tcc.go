@@ -10,8 +10,9 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/dtm-labs/client/dtmcli/dtmimp"
 	"github.com/go-resty/resty/v2"
+
+	"github.com/eason-lee/dtm-client/dtmcli/dtmimp"
 )
 
 // Tcc struct of tcc

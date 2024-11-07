@@ -9,12 +9,13 @@ package dtmgimp
 import (
 	context "context"
 
-	"github.com/dtm-labs/client/dtmcli/dtmimp"
-	"github.com/dtm-labs/client/dtmgrpc/dtmgpb"
 	"github.com/dtm-labs/logger"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
+
+	"github.com/eason-lee/dtm-client/dtmcli/dtmimp"
+	"github.com/eason-lee/dtm-client/dtmgrpc/dtmgpb"
 )
 
 // MustProtoMarshal must version of proto.Marshal
