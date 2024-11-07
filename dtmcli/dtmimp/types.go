@@ -11,7 +11,13 @@ import "database/sql"
 // DB inteface of dtmcli db
 type DB interface {
 	Exec(query string, args ...interface{}) (sql.Result, error)
-	QueryRow(query string, args ...interface{}) *sql.Row
+	// QueryRow(query string, args ...interface{}) *sql.Row
+}
+
+type Tx interface {
+	DB
+	Commit() error
+	Rollback() error
 }
 
 // DBConf defines db config

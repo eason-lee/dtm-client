@@ -11,12 +11,13 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/dtm-labs/client/dtmcli/dtmimp"
 	"github.com/dtm-labs/logger"
+
+	"github.com/dtm-labs/client/dtmcli/dtmimp"
 )
 
 // BarrierBusiFunc type for busi func
-type BarrierBusiFunc func(tx *sql.Tx) error
+type BarrierBusiFunc func(tx dtmimp.Tx) error
 
 // BranchBarrier every branch info
 type BranchBarrier struct {
@@ -60,7 +61,7 @@ func BarrierFrom(transType, gid, branchID, op string) (*BranchBarrier, error) {
 // Call see detail description in https://en.dtm.pub/practice/barrier.html
 // tx: local transaction connection
 // busiCall: busi func
-func (bb *BranchBarrier) Call(tx *sql.Tx, busiCall BarrierBusiFunc) (rerr error) {
+func (bb *BranchBarrier) Call(tx dtmimp.Tx, busiCall BarrierBusiFunc) (rerr error) {
 	bid := bb.newBarrierID()
 	defer dtmimp.DeferDo(&rerr, func() error {
 		return tx.Commit()
